@@ -1,0 +1,44 @@
+```{r}
+library(rio)
+lkEDU="https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/Nivel_Educativo_Censo_2017.xlsx"
+RawEDU=import(lkEDU)
+RawEDU=RawEDU[,c(2:3)]
+RawEDU=RawEDU[-c(1:6),]
+RawEDU=RawEDU[-c(3324:3343),]
+RawEDU[,]=lapply(RawEDU[,],trimws,whitespace="[\\h\\v]")
+RawEDU=na.omit(RawEDU)
+row.names(RawEDU)=NULL
+names(RawEDU)=c('1','2')
+```
+
+```{r}
+ProvName=grep('AREA', x=RawEDU$`1`)
+Sin_Nivel=grep('Sin Nivel', x=RawEDU$`1`)
+Inicial=grep('Inicial',x=RawEDU$`1`)
+Primaria=grep('Primaria',x=RawEDU$`1`)
+Secundaria=grep('Secundaria',x=RawEDU$`1`)
+Sup_NOUni_Incompleta=grep('Superior no universitaria incompleta',x=RawEDU$`1`)
+Sup_NOUni_Completa=grep('Superior no universitaria completa',x=RawEDU$`1`)
+Sup_Uni_Incompleta=grep('Superior universitaria incompleta',x=RawEDU$`1`)
+Sup_Uni_Completa=grep('Superior universitaria completa',x=RawEDU$`1`)
+Post_Uni=grep('Maestría / Doctorado',x=RawEDU$`1`)
+
+NewEDU=data.frame(RawEDU$`2`[c(ProvName)])
+NewEDU$Sin_Nivel=RawEDU$`2`[c(Sin_Nivel)]
+NewEDU$Inicial=RawEDU$`2`[c(Inicial)]
+NewEDU$Primaria=RawEDU$`2`[c(Primaria)]
+NewEDU$Secundaria=RawEDU$`2`[c(Secundaria)]
+NewEDU$Sup_NOUni_Incompleta=RawEDU$`2`[c(Sup_NOUni_Incompleta)]
+NewEDU$Sup_NOUni_Completa=RawEDU$`2`[c(Sup_NOUni_Completa)]
+NewEDU$Sup_Uni_Incompleta=RawEDU$`2`[c(Sup_Uni_Incompleta)]
+NewEDU$Sup_Uni_Completa=RawEDU$`2`[c(Sup_Uni_Completa)]
+NewEDU$Post_Uni=RawEDU$`2`[c(Post_Uni)]
+```
+
+```{r}
+library(stringr)
+names(NewEDU)=c('Nom_Prov','SN','Ini','Sec','NOUni_Inc','NOUni_Com','Uni_Inc','Uni_Com','Post_Uni')
+NewEDU[,1]=str_split(NewEDU[,1],pattern = ':',simplify = T)[,2]
+NewEDU[,c(2:10)]=lapply(NewEDU[,c(2:10)],as.numeric)
+NewEDU=na.omit(NewEDU)
+```
