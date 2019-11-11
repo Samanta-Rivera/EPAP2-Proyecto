@@ -37,7 +37,7 @@ NewEDU$Post_Uni=RawEDU$`2`[c(Post_Uni)]
 
 ```{r}
 library(stringr)
-names(NewEDU)=c('Nom_Prov','SN','Ini','Sec','NOUni_Inc','NOUni_Com','Uni_Inc','Uni_Com','Post_Uni')
+names(NewEDU)=c('Nom_Prov','SN','Ini','Pri','Sec','NOUni_Inc','NOUni_Com','Uni_Inc','Uni_Com','Post_Uni')
 NewEDU[,1]=str_split(NewEDU[,1],pattern = ':',simplify = T)[,2]
 NewEDU[,c(2:10)]=lapply(NewEDU[,c(2:10)],as.numeric)
 NewEDU=na.omit(NewEDU)
