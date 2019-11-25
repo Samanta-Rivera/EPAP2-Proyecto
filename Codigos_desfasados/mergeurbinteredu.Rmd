@@ -93,4 +93,3 @@ library(rio)
 UrbInter=merge(dataurb,datainter,by.x='Provincia', by.y='Provincia')
 UrbInterEdu=merge(UrbInter,dataedu)
 ```
-the end
