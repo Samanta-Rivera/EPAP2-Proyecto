@@ -1,0 +1,471 @@
+# DATOS 2007
+
+```{r}
+library(rio)
+urb_2007=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/Urbanizacion_Censo_2007.xlsx')
+```
+
+```{r}
+urb_2007=urb_2007[,c(2,3,8,10)]
+urb_2007=urb_2007[-c(1:3),]
+names(urb_2007)=c('Region','Province','Total_Pop','Rural_Pop')
+
+rownames(urb_2007)=NULL
+```
+
+```{r}
+library(stringi)
+
+urb_2007$Region=stri_trans_general(str = urb_2007$Region, id = "Latin-ASCII")
+
+urb_2007$Province=stri_trans_general(str = urb_2007$Province, id = "Latin-ASCII")
+```
+
+```{r}
+inter_2007=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/Internet_Censo_2007.xlsx')
+```
+
+```{r}
+inter_2007=inter_2007[,c(2,3,8)]
+inter_2007=inter_2007[-c(1:3),]
+names(inter_2007)=c('Region','Province','Inter_Porc')
+
+rownames(inter_2007)=NULL
+```
+
+```{r}
+inter_2007$Region=stri_trans_general(str = inter_2007$Region, id = "Latin-ASCII")
+
+inter_2007$Province=stri_trans_general(str = inter_2007$Province, id = "Latin-ASCII")
+```
+
+# DATOS 2017
+
+```{r}
+urb_raw=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/URBANIZACION_CENSO_2017.xlsx')
+```
+
+```{r}
+urb_raw=urb_raw[,c(2:4)]
+urb_raw=urb_raw[c(7:1360),]
+row.names(urb_raw)=NULL
+names(urb_raw)=c('1','2','3')
+```
+
+```{r}
+ubi_urb=grep('AREA', x=urb_raw$`1`)
+provname_urb=grep('prov',x=urb_raw$`2`)
+provnames_2_urb=grep('Prov',x=urb_raw$`2`)
+rural_urb=grep('Rural',x=urb_raw$`1`)
+```
+
+```{r}
+urb_2017=data.frame(urb_raw$`1`[c(ubi_urb)])
+urb_2017=urb_2017[-67,]
+urb_2017=as.data.frame(urb_2017)
+urb_2017$Name=urb_raw$`2`[c(provname_urb)]
+urb_2017$Rur=urb_raw$`3`[c(rural_urb)]
+names(urb_2017)=c('Ubigeo','Name','Rural_Porc')
+```
+
+```{r}
+library(readr)
+library(stringr)
+urb_2017[,1]=str_split(urb_2017[,1],
+                         pattern = '#',
+                         simplify = T)[,2]
+urb_2017[,1]=trimws(urb_2017[,1],whitespace = "[\\h\\v]")
+urb_2017[,1]=paste0(urb_2017[,1],'00')
+
+urb_2017$Region=str_split(urb_2017[,2],
+                         pattern = ',',
+                         simplify = T)[,1]
+urb_2017$Province=str_split(urb_2017[,2],
+                         pattern = ':',
+                         simplify = T)[,2]
+
+urb_2017=urb_2017[,-2]
+
+urb_2017$Province[145:147]=str_split(urb_2017$Region[145:147],'de ', simplify=T)[,3]
+urb_2017$Region[145:147]=str_split(urb_2017$Region[145:147],'prov', simplify=T)[,1]
+
+urb_2017[196,]=c('070100',0,'Callao','Callao')
+urb_2017[,c(3,4)]=lapply(urb_2017[,c(3,4)],trimws,whitespace = "[\\h\\v]")
+
+urb_2017[,2]=as.numeric(urb_2017[,2])
+```
+
+```{r}
+urb_2017$Region=stri_trans_general(str = urb_2017$Region, id = "Latin-ASCII")
+
+urb_2017$Province=stri_trans_general(str = urb_2017$Province, id = "Latin-ASCII")
+
+urb_2017[,3]=gsub('La Lbertad','La Libertad',urb_2017[,3])
+```
+
+```{r}
+inter_raw=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/INTERNET_CESNO_2017.xlsx')
+```
+
+```{r}
+inter_raw=inter_raw[,c(2:5)]
+inter_raw=inter_raw[c(9:1379),]
+
+row.names(inter_raw)=NULL
+names(inter_raw)=c('1','2','3','4')
+```
+
+```{r}
+ubi_inter=grep('AREA', x=inter_raw$`1`)
+provname_inter=grep('prov',x=inter_raw$`2`)
+provname_2_inter=grep('Prov',x=inter_raw$`2`)
+internet_inter=grep('Sí',x=inter_raw$`1`)
+internet_inter=internet_inter[-67]
+```
+
+```{r}
+inter_2017=data.frame(inter_raw$`1`[c(ubi_inter)])
+inter_2017=inter_2017[-67,]
+inter_2017=as.data.frame(inter_2017)
+inter_2017$Name=inter_raw$`2`[c(provname_inter)]
+
+inter_2017$Internet=inter_raw$`4`[c(internet_inter)]
+
+names(inter_2017)=c('Ubigeo','Name','Inter_Porc')
+```
+
+```{r}
+inter_2017[,1]=str_split(inter_2017[,1],
+                         pattern = '#',
+                         simplify = T)[,2]
+inter_2017[,1]=trimws(inter_2017[,1],whitespace = "[\\h\\v]")
+inter_2017[,1]=paste0(inter_2017[,1],'00')
+
+inter_2017$Region=str_split(inter_2017[,2],
+                         pattern = ',',
+                         simplify = T)[,1]
+inter_2017$Province=str_split(inter_2017[,2],
+                         pattern = ':',
+                         simplify = T)[,2]
+
+inter_2017=inter_2017[,-2]
+
+inter_2017$Province[145:147]=str_split(inter_2017$Region[145:147],'de ', simplify=T)[,3]
+inter_2017$Region[145:147]=str_split(inter_2017$Region[145:147],'prov', simplify=T)[,1]
+
+inter_2017[196,]=c('070100',0.442060940246706,'Callao','Callao')
+inter_2017[,c(3,4)]=lapply(inter_2017[,c(3,4)],trimws,whitespace = "[\\h\\v]")
+
+inter_2017[,2]=as.numeric(inter_2017[,2])
+```
+
+```{r}
+inter_2017$Region=stri_trans_general(str = inter_2017$Region, id = "Latin-ASCII")
+
+inter_2017$Province=stri_trans_general(str = inter_2017$Province, id = "Latin-ASCII")
+
+inter_2017[,3]=gsub('La Lbertad','La Libertad',inter_2017[,3])
+```
+
+# IDH 2012
+
+```{r}
+idh_2012=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/IDH_PNUD2012.xlsx')
+```
+
+```{r}
+idh_2012[,-c(1,2,3,10,12,14,16)]=NULL
+idh_2012=idh_2012[c(8:2257),]
+names(idh_2012)=c("Ubigeo",'Region','Province','LifeHope','CompSecEdu','EduYears','IncFamPPC')
+idh_2012[,c(4:7)]=lapply(idh_2012[,c(4:7)],as.numeric)
+```
+
+```{r}
+list_idh=as.list(idh_2012[,1])
+provinces=grep(pattern='[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0]{1}[0]{1}',x=list_idh)
+idh_2012=idh_2012[c(provinces),]
+row.names(idh_2012)=NULL
+```
+
+```{r}
+idh_2012$Region[2:8]='Amazonas'
+idh_2012$Region[10:29]='Ancash'
+idh_2012$Region[31:37]='Apurimac'
+idh_2012$Region[39:46]='Arequipa'
+idh_2012$Region[48:58]='Ayacucho'
+idh_2012$Region[60:72]='Cajamarca'
+idh_2012$Region[73]='Callao'
+idh_2012$Region[75:87]='Cusco'
+idh_2012$Region[89:95]='Huancavelica'
+idh_2012$Region[97:107]='Huanuco'
+idh_2012$Region[109:113]='Ica'
+idh_2012$Region[115:123]='Junin'
+idh_2012$Region[125:136]='La Libertad'
+idh_2012$Region[138:140]='Lambayeque'
+idh_2012$Region[142:151]='Lima'
+idh_2012$Region[153:159]='Loreto'
+idh_2012$Region[161:163]='Madre De Dios'
+idh_2012$Region[165:167]='Moquegua'
+idh_2012$Region[169:171]='Pasco'
+idh_2012$Region[173:180]='Piura'
+idh_2012$Region[182:194]='Puno'
+idh_2012$Region[196:205]='San Martin'
+idh_2012$Region[207:210]='Tacna'
+idh_2012$Region[212:214]='Tumbes'
+idh_2012$Region[216:219]='Ucayali'
+```
+
+```{r}
+idh_2012=na.omit(idh_2012)
+row.names(idh_2012)=NULL
+```
+
+```{r}
+idh_2012$Region=stri_trans_general(str = idh_2012$Region, id = "Latin-ASCII")
+
+idh_2012$Province=stri_trans_general(str = idh_2012$Province, id = "Latin-ASCII")
+```
+
+```{r}
+idh_2012$Prov_Name=paste0(idh_2012$Region,idh_2012$Province)
+idh_2012[,c(2,3)]=NULL
+```
+
+
+# Creación de las tablas
+
+```{r}
+urb_2007[,c(3,4)]=lapply(urb_2007[,c(3,4)],as.numeric)
+
+urb_2007$Rur_Porc <- urb_2007$Rural_Pop / urb_2007$Total_Pop
+urb_2007[,c(3,4)]=NULL
+```
+
+```{r}
+inter_2007$Region=NULL
+```
+
+```{r}
+Data2007=merge(urb_2007, inter_2007)
+Data2007$Prov_Name=paste0(Data2007$Region,Data2007$Province)
+Data2007=Data2007[,c(3:5)]
+```
+
+```{r}
+Data2007=merge(Data2007,idh_2012)
+
+Data2007$Code=Data2007$Ubigeo
+Data2007$Ubigeo=NULL
+```
+
+```{r}
+Data2007[,c(2:7)]=lapply(Data2007[,c(2:7)],as.numeric)
+```
+
+```{r}
+inter_2017$Region=NULL
+```
+
+```{r}
+Data2017=merge(urb_2017, inter_2017)
+Data2017$Prov_Name=paste0(Data2017$Region,Data2017$Province)
+Data2017[,c(1,2,4)]=NULL
+```
+
+```{r}
+Data2017=merge(Data2017,idh_2012)
+
+Data2017$Code=Data2017$Ubigeo
+Data2017$Ubigeo=NULL
+```
+
+# Limpieza del entorno
+
+```{r}
+rm(idh_2012)
+rm(inter_2007)
+rm(inter_2017)
+rm(inter_raw)
+rm(list_idh)
+rm(urb_2007)
+rm(urb_2017)
+rm(urb_raw)
+
+rm(internet_inter)
+rm(provinces)
+rm(provname_inter)
+rm(provname_2_inter)
+rm(provname_urb)
+rm(provnames_2_urb)
+rm(rural_urb)
+rm(ubi_inter)
+rm(ubi_urb)
+```
+
+# Reconversion de la variable poblacion rural
+
+```{r}
+Data2007$Rur_Porc= 1 - Data2007$Rur_Porc
+names(Data2007)[2]='Urb_Porc'
+
+Data2017$Rural_Porc= 1 - Data2017$Rural_Porc
+names(Data2017)[2]='Urb_Porc'
+```
+
+# EFA
+
+```{r}
+library(polycor)
+library(ggcorrplot)
+
+corMatrix_2007=polycor::hetcor(Data2007[,c(2:7)])$correlations
+ggcorrplot(corMatrix_2007,
+           p.mat = cor_pmat(corMatrix_2007),
+           insig = "blank")
+```
+
+```{r}
+library(psych)
+psych::KMO(corMatrix_2007)
+```
+
+```{r}
+cortest.bartlett(corMatrix_2007,n=nrow(Data2007[,c(2:7)]))$p.value>0.05
+```
+
+```{r}
+library(matrixcalc)
+is.singular.matrix(corMatrix_2007)
+```
+
+```{r}
+fa.parallel(Data2007[,c(2:7)],fm= 'ML', fa= 'fa')
+```
+
+```{r}
+library(GPArotation)
+resfa_2007 <- fa(Data2007[,c(2:7)],nfactors= 1,cor='mixed', rotate='varimax', fm='minres')
+```
+
+```{r}
+print(resfa_2007$loadings,cutoff = 0.51)
+```
+
+```{r}
+fa.diagram(resfa_2007)
+```
+
+```{r}
+resfa_2007$crms
+```
+
+```{r}
+resfa_2007$RMSEA
+```
+
+```{r}
+resfa_2007$TLI
+```
+
+```{r}
+sort(resfa_2007$communality)
+```
+
+```{r}
+corMatrix_2017=polycor::hetcor(Data2017[,c(2:7)])$correlations
+ggcorrplot(corMatrix_2017,
+           p.mat = cor_pmat(corMatrix_2017),
+           insig = "blank")
+```
+
+```{r}
+psych::KMO(corMatrix_2017)
+```
+
+```{r}
+cortest.bartlett(corMatrix_2017,n=nrow(Data2017[,c(2:7)]))$p.value>0.05
+```
+
+```{r}
+is.singular.matrix(corMatrix_2017)
+```
+
+```{r}
+fa.parallel(Data2017[,c(2:7)],fm= 'ML', fa= 'fa')
+```
+
+```{r}
+resfa_2017 <- fa(Data2017[,c(2:7)],nfactors= 1,cor='mixed', rotate='varimax', fm='minres')
+```
+
+```{r}
+print(resfa_2017$loadings,cutoff = 0.51)
+```
+
+```{r}
+fa.diagram(resfa_2017)
+```
+
+```{r}
+resfa_2017$crms
+```
+
+```{r}
+resfa_2017$RMSEA
+```
+
+```{r}
+resfa_2017$TLI
+```
+
+```{r}
+sort(resfa_2017$communality)
+```
+
+Creando latentes
+```{r}
+Edu=Data2017[,c(5,6)]
+Eduresfa <- fa(Edu,nfactors = 1,cor = 'mixed',rotate = "varimax",fm="minres")
+```
+
+
+```{r}
+fa.diagram(Eduresfa)
+```
+```{r}
+model='Educación =~ CompSecEdu + EduYears'
+Data2017[,c(5,6)]=scale(Data2017[,c(5,6)])
+library(lavaan)
+```
+
+```{r}
+cfa_fit <- cfa(model, data=Data2017, 
+           std.lv=TRUE,  
+           missing="fiml")
+```
+
+```{r}
+allParamCFA=parameterEstimates(cfa_fit,standardized = T)
+allFitCFA=as.list(fitMeasures(cfa_fit))
+```
+
+```{r}
+library(knitr)
+kable(allParamCFA[allParamCFA$op=="=~",])
+```
+
+```{r}
+allFitCFA[c("chisq", "df", "pvalue")] # pvalue>0.05
+```
+
+```{r}
+allFitCFA$tli # > 0.90
+```
+
+```{r}
+allFitCFA[c('rmsea.ci.lower','rmsea' ,'rmsea.ci.upper')] # 0.05 en el Int de Conf?
+```
+```{r}
+Data2017=as.data.frame(cbind(Data2017,lavPredict(cfa_fit)))
+```
+
