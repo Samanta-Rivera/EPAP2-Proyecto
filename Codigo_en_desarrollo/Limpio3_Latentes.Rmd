@@ -8,8 +8,7 @@ urb_2007=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DAT
 ```{r}
 urb_2007=urb_2007[,c(2,3,8,10)]
 urb_2007=urb_2007[-c(1:3),]
-names(urb_2007)=c('Region','Province','','Rural_Pop')
-Total_Pop
+names(urb_2007)=c('Region','Province','Total_Pop','Rural_Pop')
 rownames(urb_2007)=NULL
 ```
 
@@ -91,7 +90,16 @@ row.names(idh_2007)=NULL
 ```
 
 ```{r}
+library(stringi)
 
+idh_2007$Region=stri_trans_general(str = idh_2007$Region, id = "Latin-ASCII")
+
+idh_2007$Province=stri_trans_general(str = idh_2007$Province, id = "Latin-ASCII")
+```
+
+```{r}
+idh_2007$Prov_Name=paste0(idh_2007$Region,idh_2007$Province)
+idh_2007[,c(2,3)]=NULL
 ```
 
 # DATOS 2017
