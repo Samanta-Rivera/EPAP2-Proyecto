@@ -581,6 +581,8 @@ rm(model_2017)
 ```{r}
 library(cluster)
 library(factoextra)
+g.dist2007 = daisy(Data2007[,-c(1,6)], metric="gower")
+g.dist2017 = daisy(Data2017[,-c(1,6)], metric="gower")
 ```
 
 
@@ -601,6 +603,12 @@ fviz_nbclust(Data2007[,-c(1,6)], hcut,diss=g.dist,method = "gap_stat",k.max = 10
 #ahora con la data 2017
 
 ```{r}
+Data2017[,7]=as.numeric(Data2017[,7])
+str(Data2017)
+```
+
+
+```{r}
 fviz_nbclust(Data2017[,-c(1,6)], pam,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
 
 ```
@@ -609,4 +617,69 @@ fviz_nbclust(Data2017[,-c(1,6)], pam,diss=g.dist,method = "gap_stat",k.max = 10,
 ```{r}
 fviz_nbclust(Data2017[,-c(1,6)], hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
 ```
+
+Conglomeración por densidad
+
+```{r}
+proyeccion2007 = cmdscale(g.dist2007, k=2,add = T)
+proyeccion2017 = cmdscale(g.dist2017, k=2,add = T)
+```
+
+```{r}
+Data2007$dim1=proyeccion2007$points[,1]
+Data2007$dim2=proyeccion2007$points[,2]
+```
+
+```{r}
+Data2017$dim1=proyeccion2017$points[,1]
+Data2017$dim2=proyeccion2017$points[,2]
+```
+
+
+
+```{r}
+g.dist.cmd2007 = daisy(Data2007[,c('dim1','dim2')], metric = 'euclidean')
+g.dist.cmd2017 = daisy(Data2017[,c('dim1','dim2')], metric = 'euclidean')
+```
+
+```{r}
+library(dbscan)
+kNNdistplot(g.dist.cmd2007, k=5)
+```
+
+```{r}
+kNNdistplot(g.dist.cmd2017, k=5)
+```
+
+```{r}
+library(fpc)
+db.cmd2007 = dbscan(g.dist.cmd2007, eps=0.075, MinPts=5,method = 'dist')
+db.cmd2017 = dbscan(g.dist.cmd2017, eps=0.11, MinPts=5,method = 'dist')
+```
+
+```{r}
+Data2007$dbCMD=as.factor(db.cmd2007$cluster)
+Data2017$dbCMD=as.factor(db.cmd2017$cluster)
+```
+
+```{r}
+min(Data2007[,c('dim1','dim2')]); max(Data2007[,c('dim1','dim2')])
+min(Data2017[,c('dim1','dim2')]); max(Data2017[,c('dim1','dim2')])
+limites2007=c(-0.75,0.40)
+limites2017=c(-0.75,0.44)
+```
+
+
+```{r}
+library(ggrepel)
+base2007= ggplot(Data2007[,-c(1,6)],aes(x=dim1, y=dim2)) + ylim(limites2007) + xlim(limites2007) + coord_fixed()
+dbplot= base2007 + geom_point(aes(color=dbCMD)) 
+dbplot
+```
+```{r}
+base2017= ggplot(Data2017[,-c(1,6)],aes(x=dim1, y=dim2)) + ylim(limites2017) + xlim(limites2017) + coord_fixed()
+dbplot= base2017 + geom_point(aes(color=dbCMD)) 
+dbplot
+```
+
 
