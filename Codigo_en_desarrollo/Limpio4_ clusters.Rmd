@@ -665,21 +665,37 @@ Data2017$dbCMD=as.factor(db.cmd2017$cluster)
 ```{r}
 min(Data2007[,c('dim1','dim2')]); max(Data2007[,c('dim1','dim2')])
 min(Data2017[,c('dim1','dim2')]); max(Data2017[,c('dim1','dim2')])
-limites2007=c(-0.75,0.40)
-limites2017=c(-0.75,0.44)
+limites2007=c(-0.75,0.41)
+limites2017=c(-0.75,0.47)
 ```
 
 
 ```{r}
 library(ggrepel)
 base2007= ggplot(Data2007[,-c(1,6)],aes(x=dim1, y=dim2)) + ylim(limites2007) + xlim(limites2007) + coord_fixed()
-dbplot= base2007 + geom_point(aes(color=dbCMD)) 
-dbplot
+dbplot2007= base2007 + geom_point(aes(color=dbCMD)) 
+dbplot2007
 ```
 ```{r}
 base2017= ggplot(Data2017[,-c(1,6)],aes(x=dim1, y=dim2)) + ylim(limites2017) + xlim(limites2017) + coord_fixed()
-dbplot= base2017 + geom_point(aes(color=dbCMD)) 
-dbplot
+dbplot2017= base2017 + geom_point(aes(color=dbCMD)) 
+dbplot2017
 ```
 
+```{r}
+row.names(Data2007)=Data2007$Code
+
+dbplot2007 + geom_text_repel(size=2, aes(label=rownames(Data2007)))
+```
+```{r}
+db.cmd2007
+#Perdido PunoPuno
+```
+
+```{r}
+row.names(Data2017)=Data2017$Code
+
+dbplot2017 + geom_text_repel(size=2, aes(label=rownames(Data2017)))
+#Perdidos: San Antonio de Putina-Puno/Huancavelica-Huancavelica/Huamanga-Ayacucho/Sechura-Piura/Puno-Puno
+```
 
