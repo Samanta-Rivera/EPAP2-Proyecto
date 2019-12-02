@@ -315,7 +315,7 @@ Data2007=Data2007[,c(3:5)]
 ```
 
 ```{r}
-Data2007=merge(Data2007,idh_2012)
+Data2007=merge(Data2007,idh_2007)
 
 Data2007$Code=Data2007$Ubigeo
 Data2007$Ubigeo=NULL
@@ -345,17 +345,20 @@ Data2017$Ubigeo=NULL
 # Limpieza del entorno
 
 ```{r}
+rm(idh_2007)
 rm(idh_2012)
 rm(inter_2007)
 rm(inter_2017)
 rm(inter_raw)
-rm(list_idh)
+rm(list_idh_2007)
+rm(list_idh_2012)
 rm(urb_2007)
 rm(urb_2017)
 rm(urb_raw)
 
 rm(internet_inter)
-rm(provinces)
+rm(provinces_2007)
+rm(provinces_2012)
 rm(provname_inter)
 rm(provname_2_inter)
 rm(provname_urb)
@@ -407,7 +410,7 @@ fa.parallel(Data2007[,c(2:7)],fm= 'ML', fa= 'fa')
 
 ```{r}
 library(GPArotation)
-resfa_2007 <- fa(Data2007[,c(2:7)],nfactors= 1,cor='mixed', rotate='varimax', fm='minres')
+resfa_2007 <- fa(Data2007[,c(2:7)],nfactors= 4,cor='mixed', rotate='varimax', fm='minres')
 ```
 
 ```{r}
@@ -458,7 +461,7 @@ fa.parallel(Data2017[,c(2:7)],fm= 'ML', fa= 'fa')
 ```
 
 ```{r}
-resfa_2017 <- fa(Data2017[,c(2:7)],nfactors= 1,cor='mixed', rotate='varimax', fm='minres')
+resfa_2017 <- fa(Data2017[,c(2:7)],nfactors= 2,cor='mixed', rotate='varimax', fm='minres')
 ```
 
 ```{r}
@@ -487,94 +490,116 @@ sort(resfa_2017$communality)
 
 Creando latentes 2017
 ```{r}
-Edu2017=Data2017[,c(5,6)]
-Eduresfa2017 <- fa(Edu2017,nfactors = 1,cor = 'mixed',rotate = "varimax",fm="minres")
+edu_resfa_2017 <- fa(Data2017[,c(5,6)],nfactors = 1,cor = 'mixed',rotate = "varimax",fm="minres")
 ```
 
 
 ```{r}
-fa.diagram(Eduresfa2017)
+fa.diagram(edu_resfa_2017)
 ```
 ```{r}
-model2017='Educacion =~ CompSecEdu + EduYears'
+model_2017='Educacion =~ CompSecEdu + EduYears'
 Data2017[,c(5,6)]=scale(Data2017[,c(5,6)])
 library(lavaan)
 ```
 
 ```{r}
-cfa_fit2017 <- cfa(model2017, data=Data2017, 
+cfa_fit_2017 <- cfa(model_2017, data=Data2017[,c(5,6)], 
            std.lv=TRUE,  
            missing="fiml")
 ```
 
 ```{r}
-allParamCFA2017=parameterEstimates(cfa_fit2017,standardized = T)
-allFitCFA2017=as.list(fitMeasures(cfa_fit2017))
+allParamCFA_2017=parameterEstimates(cfa_fit_2017,standardized = T)
+allFitCFA_2017=as.list(fitMeasures(cfa_fit_2017))
 ```
 
 ```{r}
 library(knitr)
-kable(allParamCFA2017[allParamCFA2017$op=="=~",])
+kable(allParamCFA_2017[allParamCFA_2017$op=="=~",])
 ```
 
 ```{r}
-allFitCFA2017[c("chisq", "df", "pvalue")] # pvalue>0.05
+allFitCFA_2017[c("chisq", "df", "pvalue")] # pvalue>0.05
 ```
 
 ```{r}
-allFitCFA2017$tli # > 0.90
+allFitCFA_2017$tli # > 0.90
 ```
 
 ```{r}
-allFitCFA2017[c('rmsea.ci.lower','rmsea' ,'rmsea.ci.upper')] # 0.05 en el Int de Conf?
+allFitCFA_2017[c('rmsea.ci.lower','rmsea' ,'rmsea.ci.upper')] # 0.05 en el Int de Conf?
 ```
+
 ```{r}
-Data2017=as.data.frame(cbind(Data2017,lavPredict(cfa_fit2017)))
+Data2017=as.data.frame(cbind(Data2017,lavPredict(cfa_fit_2017)))
 ```
 
 Creando 2007
 
 ```{r}
-Edu2007=Data2007[,c(5,6)]
-Eduresfa2007 <- fa(Edu2007,nfactors = 1,cor = 'mixed',rotate = "varimax",fm="minres")
+edu_resfa_2007 <- fa(Data2007[,c(5,6)],nfactors = 1,cor = 'mixed',rotate = "varimax",fm="minres")
 ```
 
 ```{r}
-fa.diagram(Eduresfa2007)
+fa.diagram(edu_resfa_2007)
 ```
 
 ```{r}
-model2007='Educacion =~ CompSecEdu + EduYears'
+model_2007='Educacion =~ CompSecEdu + EduYears'
 Data2007[,c(5,6)]=scale(Data2007[,c(5,6)])
 ```
 
 ```{r}
-cfa_fit2007 <- cfa(model2007, data=Data2007, 
+cfa_fit_2007 <- cfa(model_2007, data=Data2007[,c(5,6)], 
            std.lv=TRUE,  
            missing="fiml")
 ```
 
 ```{r}
-allParamCFA2007=parameterEstimates(cfa_fit2007,standardized = T)
-allFitCFA2007=as.list(fitMeasures(cfa_fit2007))
+allParamCFA_2007=parameterEstimates(cfa_fit_2007,standardized = T)
+allFitCFA_2007=as.list(fitMeasures(cfa_fit_2007))
 ```
 
 ```{r}
-kable(allParamCFA2007[allParamCFA2007$op=="=~",])
+kable(allParamCFA_2007[allParamCFA_2007$op=="=~",])
 ```
 
 ```{r}
-allFitCFA2007[c("chisq", "df", "pvalue")] # pvalue>0.05
+allFitCFA_2007[c("chisq", "df", "pvalue")] # pvalue>0.05
 ```
 
 ```{r}
-allFitCFA2007$tli # > 0.90
+allFitCFA_2007$tli # > 0.90
 ```
 ```{r}
-allFitCFA2007[c('rmsea.ci.lower','rmsea' ,'rmsea.ci.upper')] # 0.05 en el Int de Conf?
+allFitCFA_2007[c('rmsea.ci.lower','rmsea' ,'rmsea.ci.upper')] # 0.05 en el Int de Conf?
 ```
 
 ```{r}
-Data2007=as.data.frame(cbind(Data2007,lavPredict(cfa_fit2007)))
+Data2007=as.data.frame(cbind(Data2007,lavPredict(cfa_fit_2007)))
+```
+
+```{r}
+Data2007[,c(5,6)]=NULL
+Data2017[,c(5,6)]=NULL
+```
+
+```{r}
+rm(allFitCFA_2007)
+rm(allFitCFA_2017)
+rm(allParamCFA_2007)
+rm(allParamCFA_2017)
+rm(cfa_fit_2007)
+rm(cfa_fit_2017)
+rm(corMatrix_2007)
+rm(corMatrix_2017)
+rm(edu_resfa_2007)
+rm(edu_resfa_2017)
+rm(resfa_2007)
+rm(resfa_2017)
+
+rm(model_2007)
+rm(model_2017)
 ```
 
