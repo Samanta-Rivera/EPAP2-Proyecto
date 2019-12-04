@@ -526,3 +526,26 @@ rm(g.dist2007)
 rm(g.dist2017)
 ```
 
+Mapa de clusters
+
+```{r}
+library(sp)
+library(geojsonio)
+library(rgdal)
+
+Map <- rgdal::readOGR('https://github.com/PoliticaygobiernoPUCP/estadistica_anapol2/raw/master/PER_adm2.json',stringsAsFactors = FALSE)
+```
+
+```{r}
+plot(Map, border='black')
+```
+
+```{r}
+sort(Map@data$NAME_2)
+```
+
+```{r}
+library(stringi)
+Map$NAME_2=stri_trans_general(str=Map$NAME_2, id="Latin-ASCII")
+```
+
