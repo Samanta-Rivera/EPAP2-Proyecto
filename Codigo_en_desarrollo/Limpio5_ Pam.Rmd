@@ -375,9 +375,7 @@ fviz_nbclust(Data2007[,-c(1,8)], hcut,diss=g.dist,method = "gap_stat",k.max = 10
 
 ```{r}
 fviz_nbclust(Data2017[,-c(1,8)], pam,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
-
 ```
-
 
 ```{r}
 fviz_nbclust(Data2017[,-c(1,8)], hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
@@ -432,13 +430,13 @@ limites2007=c(-0.72,0.42)
 limites2017=c(-0.72,0.48)
 ```
 
-
 ```{r}
 library(ggrepel)
 base2007= ggplot(Data2007[,-c(1,8)],aes(x=dim1, y=dim2)) + ylim(limites2007) + xlim(limites2007) + coord_fixed()
 dbplot2007= base2007 + geom_point(aes(color=dbCMD)) 
 dbplot2007
 ```
+
 ```{r}
 base2017= ggplot(Data2017[,-c(1,8)],aes(x=dim1, y=dim2)) + ylim(limites2017) + xlim(limites2017) + coord_fixed()
 dbplot2017= base2017 + geom_point(aes(color=dbCMD)) 
@@ -450,12 +448,42 @@ list_outliers_2007=grep('[0]{1}',Data2007$dbCMD)
 list_outliers_2017=grep('[0]{1}',Data2017$dbCMD)
 ```
 
+```{r}
+rm(base2007)
+rm(base2017)
+rm(db.cmd2007)
+rm(db.cmd2017)
+rm(dbplot2007)
+rm(dbplot2017)
+rm(proyeccion2007)
+rm(proyeccion2017)
+
+rm(g.dist.cmd2007)
+rm(g.dist.cmd2017)
+rm(limites2007)
+rm(limites2017)
+rm(list_outliers_2007)
+rm(list_outliers_2017)
+
+Data2007=Data2007[,c(1:8)]
+Data2017=Data2017[,c(1:8)]
+```
+
+
 siluetas de cluster 2007
 
 ```{r}
 res.pam2007 = pam(g.dist2007,3,cluster.only = F)
 res.agnes2007 = hcut(g.dist2007, k = 3,hc_func='agnes',hc_method = "ward.D")
 res.diana2007 = hcut(g.dist2007, k = 3,hc_func='diana')
+```
+
+```{r}
+fviz_silhouette(res.pam2007)
+```
+
+```{r}
+fviz_silhouette(res.agnes2007)
 ```
 
 ```{r}
@@ -478,4 +506,23 @@ fviz_silhouette(res.agnes2017)
 ```{r}
 fviz_silhouette(res.diana2017)
 ```
-#Al realizar las respectivas pruebas a las variables indepedientes, notamos que el mejor metodo de conglomeración para nuestros elementos es jerarquica aglomerativa.
+
+#Al realizar las respectivas pruebas a las variables indepedientes, notamos que el mejor metodo de conglomeración para nuestros elementos es particionante.
+
+```{r}
+Data2007$Cluster=res.pam2007$clustering
+Data2017$Cluster=res.pam2017$clustering
+```
+
+```{r}
+rm(res.agnes2007)
+rm(res.agnes2017)
+rm(res.diana2007)
+rm(res.diana2017)
+rm(res.pam2007)
+rm(res.pam2017)
+
+rm(g.dist2007)
+rm(g.dist2017)
+```
+
