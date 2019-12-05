@@ -1,0 +1,689 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+# DATOS 2007
+
+```{r}
+library(rio)
+urb_2007=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/Urbanizacion_Censo_2007.xlsx')
+```
+
+```{r}
+urb_2007=urb_2007[,c(2,3,8,10)]
+urb_2007=urb_2007[-c(1:3),]
+names(urb_2007)=c('Region','Province','Total_Pop','Rural_Pop')
+rownames(urb_2007)=NULL
+```
+
+```{r}
+library(stringi)
+urb_2007$Region=stri_trans_general(str = urb_2007$Region, id = "Latin-ASCII")
+urb_2007$Province=stri_trans_general(str = urb_2007$Province, id = "Latin-ASCII")
+```
+
+```{r}
+inter_2007=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/Internet_Censo_2007.xlsx')
+```
+
+```{r}
+inter_2007=inter_2007[,c(2,3,8)]
+inter_2007=inter_2007[-c(1:3),]
+names(inter_2007)=c('Region','Province','Inter_Porc')
+rownames(inter_2007)=NULL
+```
+
+```{r}
+inter_2007$Region=stri_trans_general(str = inter_2007$Region, id = "Latin-ASCII")
+inter_2007$Province=stri_trans_general(str = inter_2007$Province, id = "Latin-ASCII")
+```
+
+```{r}
+idh_2007=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/IDH_PNUD2007.xlsx')
+```
+
+```{r}
+idh_2007[,-c(1,2,3,10,12,14,16)]=NULL
+idh_2007=idh_2007[c(8:2256),]
+names(idh_2007)=c("Ubigeo",'Region','Province','LifeHope','CompSecEdu','EduYears','IncFamPPC')
+idh_2007[,c(4:7)]=lapply(idh_2007[,c(4:7)],as.numeric)
+```
+
+```{r}
+list_idh_2007=as.list(idh_2007[,1])
+provinces_2007=grep(pattern='[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0]{1}[0]{1}',x=list_idh_2007)
+idh_2007=idh_2007[c(provinces_2007),]
+row.names(idh_2007)=NULL
+```
+
+```{r}
+idh_2007$Region[2:8]='Amazonas'
+idh_2007$Region[10:29]='Ancash'
+idh_2007$Region[31:37]='Apurimac'
+idh_2007$Region[39:46]='Arequipa'
+idh_2007$Region[48:58]='Ayacucho'
+idh_2007$Region[60:72]='Cajamarca'
+idh_2007$Region[73]='Callao'
+idh_2007$Region[75:87]='Cusco'
+idh_2007$Region[89:95]='Huancavelica'
+idh_2007$Region[97:107]='Huanuco'
+idh_2007$Region[109:113]='Ica'
+idh_2007$Region[115:123]='Junin'
+idh_2007$Region[125:136]='La Libertad'
+idh_2007$Region[138:140]='Lambayeque'
+idh_2007$Region[142:151]='Lima'
+idh_2007$Region[153:159]='Loreto'
+idh_2007$Region[161:163]='Madre De Dios'
+idh_2007$Region[165:167]='Moquegua'
+idh_2007$Region[169:171]='Pasco'
+idh_2007$Region[173:180]='Piura'
+idh_2007$Region[182:194]='Puno'
+idh_2007$Region[196:205]='San Martin'
+idh_2007$Region[207:210]='Tacna'
+idh_2007$Region[212:214]='Tumbes'
+idh_2007$Region[216:219]='Ucayali'
+```
+
+```{r}
+idh_2007=na.omit(idh_2007)
+row.names(idh_2007)=NULL
+```
+
+```{r}
+library(stringi)
+idh_2007$Region=stri_trans_general(str = idh_2007$Region, id = "Latin-ASCII")
+idh_2007$Province=stri_trans_general(str = idh_2007$Province, id = "Latin-ASCII")
+```
+
+```{r}
+idh_2007$Prov_Name=paste0(idh_2007$Region,idh_2007$Province)
+idh_2007[,c(2,3)]=NULL
+```
+
+# DATOS 2017
+
+```{r}
+urb_raw=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/URBANIZACION_CENSO_2017.xlsx')
+```
+
+```{r}
+urb_raw=urb_raw[,c(2:4)]
+urb_raw=urb_raw[c(7:1360),]
+row.names(urb_raw)=NULL
+names(urb_raw)=c('1','2','3')
+```
+
+```{r}
+ubi_urb=grep('AREA', x=urb_raw$`1`)
+provname_urb=grep('prov',x=urb_raw$`2`)
+provnames_2_urb=grep('Prov',x=urb_raw$`2`)
+rural_urb=grep('Rural',x=urb_raw$`1`)
+```
+
+```{r}
+urb_2017=data.frame(urb_raw$`1`[c(ubi_urb)])
+urb_2017=urb_2017[-67,]
+urb_2017=as.data.frame(urb_2017)
+urb_2017$Name=urb_raw$`2`[c(provname_urb)]
+urb_2017$Rur=urb_raw$`3`[c(rural_urb)]
+names(urb_2017)=c('Ubigeo','Name','Rural_Porc')
+```
+
+```{r}
+library(readr)
+library(stringr)
+urb_2017[,1]=str_split(urb_2017[,1],
+                         pattern = '#',
+                         simplify = T)[,2]
+urb_2017[,1]=trimws(urb_2017[,1],whitespace = "[\\h\\v]")
+urb_2017[,1]=paste0(urb_2017[,1],'00')
+urb_2017$Region=str_split(urb_2017[,2],
+                         pattern = ',',
+                         simplify = T)[,1]
+urb_2017$Province=str_split(urb_2017[,2],
+                         pattern = ':',
+                         simplify = T)[,2]
+urb_2017=urb_2017[,-2]
+urb_2017$Province[145:147]=str_split(urb_2017$Region[145:147],'de ', simplify=T)[,3]
+urb_2017$Region[145:147]=str_split(urb_2017$Region[145:147],'prov', simplify=T)[,1]
+urb_2017[196,]=c('070100',0,'Callao','Callao')
+urb_2017[,c(3,4)]=lapply(urb_2017[,c(3,4)],trimws,whitespace = "[\\h\\v]")
+urb_2017[,2]=as.numeric(urb_2017[,2])
+```
+
+```{r}
+urb_2017$Region=stri_trans_general(str = urb_2017$Region, id = "Latin-ASCII")
+urb_2017$Province=stri_trans_general(str = urb_2017$Province, id = "Latin-ASCII")
+urb_2017[,3]=gsub('La Lbertad','La Libertad',urb_2017[,3])
+```
+
+```{r}
+inter_raw=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/INTERNET_CESNO_2017.xlsx')
+```
+
+```{r}
+inter_raw=inter_raw[,c(2:5)]
+inter_raw=inter_raw[c(9:1379),]
+row.names(inter_raw)=NULL
+names(inter_raw)=c('1','2','3','4')
+```
+
+```{r}
+ubi_inter=grep('AREA', x=inter_raw$`1`)
+provname_inter=grep('prov',x=inter_raw$`2`)
+provname_2_inter=grep('Prov',x=inter_raw$`2`)
+internet_inter=grep('Sí',x=inter_raw$`1`)
+internet_inter=internet_inter[-67]
+```
+
+```{r}
+inter_2017=data.frame(inter_raw$`1`[c(ubi_inter)])
+inter_2017=inter_2017[-67,]
+inter_2017=as.data.frame(inter_2017)
+inter_2017$Name=inter_raw$`2`[c(provname_inter)]
+inter_2017$Internet=inter_raw$`4`[c(internet_inter)]
+names(inter_2017)=c('Ubigeo','Name','Inter_Porc')
+```
+
+```{r}
+inter_2017[,1]=str_split(inter_2017[,1],
+                         pattern = '#',
+                         simplify = T)[,2]
+inter_2017[,1]=trimws(inter_2017[,1],whitespace = "[\\h\\v]")
+inter_2017[,1]=paste0(inter_2017[,1],'00')
+inter_2017$Region=str_split(inter_2017[,2],
+                         pattern = ',',
+                         simplify = T)[,1]
+inter_2017$Province=str_split(inter_2017[,2],
+                         pattern = ':',
+                         simplify = T)[,2]
+inter_2017=inter_2017[,-2]
+inter_2017$Province[145:147]=str_split(inter_2017$Region[145:147],'de ', simplify=T)[,3]
+inter_2017$Region[145:147]=str_split(inter_2017$Region[145:147],'prov', simplify=T)[,1]
+inter_2017[196,]=c('070100',0.442060940246706,'Callao','Callao')
+inter_2017[,c(3,4)]=lapply(inter_2017[,c(3,4)],trimws,whitespace = "[\\h\\v]")
+inter_2017[,2]=as.numeric(inter_2017[,2])
+```
+
+```{r}
+inter_2017$Region=stri_trans_general(str = inter_2017$Region, id = "Latin-ASCII")
+inter_2017$Province=stri_trans_general(str = inter_2017$Province, id = "Latin-ASCII")
+inter_2017[,3]=gsub('La Lbertad','La Libertad',inter_2017[,3])
+```
+
+# IDH 2012
+
+```{r}
+idh_2012=import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/IDH_PNUD2012.xlsx')
+```
+
+```{r}
+idh_2012[,-c(1,2,3,10,12,14,16)]=NULL
+idh_2012=idh_2012[c(8:2257),]
+names(idh_2012)=c("Ubigeo",'Region','Province','LifeHope','CompSecEdu','EduYears','IncFamPPC')
+idh_2012[,c(4:7)]=lapply(idh_2012[,c(4:7)],as.numeric)
+```
+
+```{r}
+list_idh_2012=as.list(idh_2012[,1])
+provinces_2012=grep(pattern='[0-9]{1}[0-9]{1}[0-9]{1}[0-9]{1}[0]{1}[0]{1}',x=list_idh_2012)
+idh_2012=idh_2012[c(provinces_2012),]
+row.names(idh_2012)=NULL
+```
+
+```{r}
+idh_2012$Region[2:8]='Amazonas'
+idh_2012$Region[10:29]='Ancash'
+idh_2012$Region[31:37]='Apurimac'
+idh_2012$Region[39:46]='Arequipa'
+idh_2012$Region[48:58]='Ayacucho'
+idh_2012$Region[60:72]='Cajamarca'
+idh_2012$Region[73]='Callao'
+idh_2012$Region[75:87]='Cusco'
+idh_2012$Region[89:95]='Huancavelica'
+idh_2012$Region[97:107]='Huanuco'
+idh_2012$Region[109:113]='Ica'
+idh_2012$Region[115:123]='Junin'
+idh_2012$Region[125:136]='La Libertad'
+idh_2012$Region[138:140]='Lambayeque'
+idh_2012$Region[142:151]='Lima'
+idh_2012$Region[153:159]='Loreto'
+idh_2012$Region[161:163]='Madre De Dios'
+idh_2012$Region[165:167]='Moquegua'
+idh_2012$Region[169:171]='Pasco'
+idh_2012$Region[173:180]='Piura'
+idh_2012$Region[182:194]='Puno'
+idh_2012$Region[196:205]='San Martin'
+idh_2012$Region[207:210]='Tacna'
+idh_2012$Region[212:214]='Tumbes'
+idh_2012$Region[216:219]='Ucayali'
+```
+
+```{r}
+idh_2012=na.omit(idh_2012)
+row.names(idh_2012)=NULL
+```
+
+```{r}
+idh_2012$Region=stri_trans_general(str = idh_2012$Region, id = "Latin-ASCII")
+idh_2012$Province=stri_trans_general(str = idh_2012$Province, id = "Latin-ASCII")
+```
+
+```{r}
+idh_2012$Prov_Name=paste0(idh_2012$Region,idh_2012$Province)
+idh_2012[,c(2,3)]=NULL
+```
+
+
+# Creación de las tablas
+
+```{r}
+urb_2007[,c(3,4)]=lapply(urb_2007[,c(3,4)],as.numeric)
+urb_2007$Rur_Porc <- urb_2007$Rural_Pop / urb_2007$Total_Pop
+urb_2007[,c(3,4)]=NULL
+```
+
+```{r}
+inter_2007$Region=NULL
+```
+
+```{r}
+Data2007=merge(urb_2007, inter_2007)
+Data2007$Prov_Name=paste0(Data2007$Region,Data2007$Province)
+Data2007=Data2007[,c(3:5)]
+```
+
+```{r}
+Data2007=merge(Data2007,idh_2007)
+Data2007$Code=Data2007$Ubigeo
+Data2007$Ubigeo=NULL
+```
+
+```{r}
+Data2007[,c(2:7)]=lapply(Data2007[,c(2:7)],as.numeric)
+```
+
+```{r}
+inter_2017$Region=NULL
+```
+
+```{r}
+Data2017=merge(urb_2017, inter_2017)
+Data2017$Prov_Name=paste0(Data2017$Region,Data2017$Province)
+Data2017[,c(1,2,4)]=NULL
+```
+
+```{r}
+Data2017=merge(Data2017,idh_2012)
+Data2017$Code=Data2017$Ubigeo
+Data2017$Ubigeo=NULL
+```
+
+# Limpieza del entorno
+
+```{r}
+rm(idh_2007)
+rm(idh_2012)
+rm(inter_2007)
+rm(inter_2017)
+rm(inter_raw)
+rm(list_idh_2007)
+rm(list_idh_2012)
+rm(urb_2007)
+rm(urb_2017)
+rm(urb_raw)
+rm(internet_inter)
+rm(provinces_2007)
+rm(provinces_2012)
+rm(provname_inter)
+rm(provname_2_inter)
+rm(provname_urb)
+rm(provnames_2_urb)
+rm(rural_urb)
+rm(ubi_inter)
+rm(ubi_urb)
+```
+
+# Reconversion de la variable poblacion rural
+
+```{r}
+Data2007$Rur_Porc= 1 - Data2007$Rur_Porc
+names(Data2007)[2]='Urb_Porc'
+Data2017$Rural_Porc= 1 - Data2017$Rural_Porc
+names(Data2017)[2]='Urb_Porc'
+```
+
+
+#Agregando las variables dependientes
+
+```{r}
+linkexcel='https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/ELECCIONES_UBIGEO_PROPIO_DERECHA.xlsx'
+
+download.file(linkexcel,"ELECCIONES_UBIGEO_PROPIO_DERECHA.xlsx",rbind=FALSE)
+list=import_list('ELECCIONES_UBIGEO_PROPIO_DERECHA.xlsx')
+voto2018=list[[1]]
+voto2014=list[[2]]
+```
+
+```{r}
+#cambiar nombre
+names(voto2014)[names(voto2014)=='Ubigeo']='Code'
+names(voto2018)[names(voto2018)=='Ubigeo']='Code'
+
+#eliminarcolumnas
+voto2014[,c(2,3,4,5,6)]=NULL
+voto2018[,c(2,3,4,5,6)]=NULL
+```
+
+```{r}
+Data2007=merge(Data2007,voto2014,by.x='Code')
+Data2017=merge(Data2017,voto2018,by.x='Code')
+str(Data2007)
+str(Data2017)
+```
+
+```{r}
+rm(list)
+rm(voto2014)
+rm(voto2018)
+rm(linkexcel)
+```
+
+
+#CONGLOMERADOS
+
+```{r}
+library(cluster)
+library(factoextra)
+g.dist2007 = daisy(Data2007[,-c(1,2)], metric="gower")
+g.dist2017 = daisy(Data2017[,-c(1,2)], metric="gower")
+```
+
+```{r}
+fviz_nbclust(Data2007[,-c(1,2)], pam,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
+```
+
+```{r}
+fviz_nbclust(Data2007[,-c(1,2)], hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
+```
+
+#ahora con la data 2017
+
+```{r}
+fviz_nbclust(Data2017[,-c(1,2)], pam,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
+```
+
+```{r}
+fviz_nbclust(Data2017[,-c(1,2)], hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F)
+```
+
+Conglomeración por densidad
+
+```{r}
+proyeccion2007 = cmdscale(g.dist2007, k=2,add = T)
+proyeccion2017 = cmdscale(g.dist2017, k=2,add = T)
+```
+
+```{r}
+Data2007$dim1=proyeccion2007$points[,1]
+Data2007$dim2=proyeccion2007$points[,2]
+```
+
+```{r}
+Data2017$dim1=proyeccion2017$points[,1]
+Data2017$dim2=proyeccion2017$points[,2]
+```
+
+```{r}
+g.dist.cmd2007 = daisy(Data2007[,c('dim1','dim2')], metric = 'euclidean')
+g.dist.cmd2017 = daisy(Data2017[,c('dim1','dim2')], metric = 'euclidean')
+```
+
+```{r}
+library(dbscan)
+kNNdistplot(g.dist.cmd2007, k=5)
+```
+
+```{r}
+kNNdistplot(g.dist.cmd2017, k=5)
+```
+
+```{r}
+library(fpc)
+db.cmd2007 = dbscan(g.dist.cmd2007, eps=0.12, MinPts=7,method = 'dist')
+db.cmd2017 = dbscan(g.dist.cmd2017, eps=0.13, MinPts=7,method = 'dist')
+```
+
+```{r}
+Data2007$dbCMD=as.factor(db.cmd2007$cluster)
+Data2017$dbCMD=as.factor(db.cmd2017$cluster)
+```
+
+```{r}
+min(Data2007[,c('dim1','dim2')]); max(Data2007[,c('dim1','dim2')])
+min(Data2017[,c('dim1','dim2')]); max(Data2017[,c('dim1','dim2')])
+limites2007=c(-0.41,0.69)
+limites2017=c(-0.71,0.45)
+```
+
+```{r}
+library(ggrepel)
+base2007= ggplot(Data2007[,-c(1,2)],aes(x=dim1, y=dim2)) + ylim(limites2007) + xlim(limites2007) + coord_fixed()
+dbplot2007= base2007 + geom_point(aes(color=dbCMD)) 
+dbplot2007
+```
+
+```{r}
+base2017= ggplot(Data2017[,-c(1,2)],aes(x=dim1, y=dim2)) + ylim(limites2017) + xlim(limites2017) + coord_fixed()
+dbplot2017= base2017 + geom_point(aes(color=dbCMD)) 
+dbplot2017
+```
+
+```{r}
+list_outliers_2007=grep('[0]{1}',Data2007$dbCMD)
+list_outliers_2017=grep('[0]{1}',Data2017$dbCMD)
+```
+
+```{r}
+rm(base2007)
+rm(base2017)
+rm(db.cmd2007)
+rm(db.cmd2017)
+rm(dbplot2007)
+rm(dbplot2017)
+rm(proyeccion2007)
+rm(proyeccion2017)
+
+rm(g.dist.cmd2007)
+rm(g.dist.cmd2017)
+rm(limites2007)
+rm(limites2017)
+rm(list_outliers_2007)
+rm(list_outliers_2017)
+
+Data2007=Data2007[,c(1:9)]
+Data2017=Data2017[,c(1:9)]
+```
+
+
+siluetas de cluster 2007
+
+```{r}
+res.pam2007 = pam(g.dist2007,3,cluster.only = F)
+res.agnes2007 = hcut(g.dist2007, k = 3,hc_func='agnes',hc_method = "ward.D")
+res.diana2007 = hcut(g.dist2007, k = 3,hc_func='diana')
+```
+
+```{r}
+fviz_silhouette(res.pam2007)
+```
+
+```{r}
+fviz_silhouette(res.agnes2007)
+```
+
+```{r}
+fviz_silhouette(res.diana2007)
+```
+
+Siluetas para conglomeración 2017
+```{r}
+res.pam2017 = pam(g.dist2017,3,cluster.only = F)
+res.agnes2017 = hcut(g.dist2017, k = 3,hc_func='agnes',hc_method = "ward.D")
+res.diana2017 = hcut(g.dist2017, k = 3,hc_func='diana')
+```
+
+```{r}
+fviz_silhouette(res.pam2017)
+```
+```{r}
+fviz_silhouette(res.agnes2017)
+```
+```{r}
+fviz_silhouette(res.diana2017)
+```
+
+#Al realizar las respectivas pruebas a las variables indepedientes, notamos que el mejor metodo de conglomeración para nuestros elementos es la jerarquica divisiva.
+
+```{r}
+Data2007$ClusterDI=res.diana2007$cluster
+Data2017$ClusterDI=res.diana2017$cluster
+```
+
+```{r}
+rm(res.agnes2007)
+rm(res.agnes2017)
+rm(res.diana2007)
+rm(res.diana2017)
+rm(res.pam2007)
+rm(res.pam2017)
+
+rm(g.dist2007)
+rm(g.dist2017)
+```
+
+#Mapa de clusters
+
+#Para la data del 2007
+```{r}
+library(sp)
+library(geojsonio)
+library(rgdal)
+
+Map2007 <- rgdal::readOGR('https://github.com/PoliticaygobiernoPUCP/estadistica_anapol2/raw/master/PER_adm2.json',stringsAsFactors = FALSE)
+```
+
+```{r}
+plot(Map2007, border='black')
+```
+
+```{r}
+sort(Map2007@data$NAME_2)
+```
+
+```{r}
+library(stringi)
+Map2007$NAME_2=stri_trans_general(str=Map2007$NAME_2, id="Latin-ASCII")
+```
+
+```{r}
+Map2007@data$NAME_2=paste0(Map2007@data$NAME_1,Map2007@data$NAME_2)
+Map2007$NAME_2=stri_trans_general(str=Map2007$NAME_2, id="Latin-ASCII")
+```
+
+```{r}
+Map2007@data=merge(Map2007@data,Data2007,by.x='NAME_2',by.y='Prov_Name',all.x=T,all.y=T)
+Map2007$id=NULL
+Map2007@data[!complete.cases(Map2007@data),]
+```
+
+```{r}
+Map2007@data=na.omit(Map2007@data)
+names(Map2007)
+```
+
+```{r}
+aggregate(VOTODERECHA~ClusterDI,data = Map2007@data,FUN = mean)
+```
+
+```{r}
+library(car)
+Map2007@data$ClusterDI=recode(Map2007@data$ClusterDI,"1=2;2=1;3=3")
+
+```
+ 
+```{r}
+myColors=c('red','yellow','blue') # para 1,2 ,3
+
+plot(Map2007,col='black', main='Voto a la derecha 2007 \n usando clusters')
+plot(Map2007,col=myColors[Map2007$ClusterDI],add=T,border=NA)
+```
+
+#Para la data del 2017
+
+```{r}
+Map2017 <- rgdal::readOGR('https://github.com/PoliticaygobiernoPUCP/estadistica_anapol2/raw/master/PER_adm2.json',stringsAsFactors = FALSE)
+```
+
+```{r}
+plot(Map2017, border='black')
+```
+```{r}
+sort(Map2017@data$NAME_2)
+```
+
+```{r}
+library(stringi)
+Map2017$NAME_2=stri_trans_general(str=Map2017$NAME_2, id="Latin-ASCII")
+```
+
+```{r}
+Map2017@data$NAME_2=paste0(Map2017@data$NAME_1,Map2017@data$NAME_2)
+Map2017$NAME_2=stri_trans_general(str=Map2017$NAME_2, id="Latin-ASCII")
+```
+
+```{r}
+Map2017@data=merge(Map2017@data,Data2017,by.x='NAME_2',by.y='Prov_Name',all.x=T,all.y=T)
+Map2017$id=NULL
+Map2017@data[!complete.cases(Map2017@data),]
+```
+```{r}
+Map2017@data=na.omit(Map2017@data)
+names(Map2017)
+aggregate(VOTODERECHA~ClusterDI,data = Map2017@data,FUN = mean)
+```
+```{r}
+Map2017@data$ClusterDI=recode(Map@data$ClusterDI,"1=2;2=1;3=3")
+```
+
+```{r}
+plot(Map2017,col='black', main='Voto a la derecha 2017 \n usando clusters')
+plot(Map2017,col=myColors[Map2017$ClusterDI],add=T,border=NA)
+```
+
+```{r}
+rm(myColors )
+```
+
+#Viendo regresiones
+
+```{r}
+names(Data2007)
+names(Data2017)
+```
+
+
+```{r}
+modelo=formula(VOTODERECHA~ Urb_Porc + Inter_Porc + LifeHope + CompSecEdu + EduYears + IncFamPC)
+```
+
+
+
+
+
+
+
+
+
