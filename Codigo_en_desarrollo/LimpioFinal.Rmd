@@ -353,19 +353,30 @@ names(Data2017)[2]='Urb_Porc'
 
 ```{r}
 linkexcel='https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/ELECCIONES_UBIGEO_PROPIO_DERECHA.xlsx'
-download.file(linkexcel,"ELECCIONES_UBIGEO_PROPIO_DERECHA.xlsx",rbind=FALSE)
-list=import_list('ELECCIONES_UBIGEO_PROPIO_DERECHA.xlsx')
-voto2018=list[[1]]
-voto2014=list[[2]]
+EleccDer= import(linkexcel)
+```
+```{r}
+voto2014=EleccDer[,c(8:14)]
+voto2018=EleccDer[,c(1:7)]
 ```
 
 ```{r}
+voto2014[,c(2:6)]=NULL
+voto2018[,c(2:6)]=NULL
+```
+
+```{r}
+names(voto2014)
+names(voto2018)
+```
+
+
+```{r}
 #cambiar nombre
-names(voto2014)[names(voto2014)=='Ubigeo']='Code'
-names(voto2018)[names(voto2018)=='Ubigeo']='Code'
-#eliminarcolumnas
-voto2014[,c(2,3,4,5,6)]=NULL
-voto2018[,c(2,3,4,5,6)]=NULL
+names(voto2014)[names(voto2014)=='Ubigeo...8']='Code'
+names(voto2014)[names(voto2014)=='VOTODERECHA...14']='VOTODERECHA'
+names(voto2018)[names(voto2018)=='Ubigeo...1']='Code'
+names(voto2018)[names(voto2018)=='VOTODERECHA...7']='VOTODERECHA'
 ```
 
 ```{r}
@@ -376,10 +387,10 @@ str(Data2017)
 ```
 
 ```{r}
-rm(list)
 rm(voto2014)
 rm(voto2018)
 rm(linkexcel)
+rm(EleccDer)
 ```
 
 
@@ -656,6 +667,7 @@ plot(Map2017,col=myColors2[Map2017$ClusterDI],add=T,border=NA)
 
 ```{r}
 rm(myColors)
+rm(myColors2)
 ```
 
 #Viendo regresiones
