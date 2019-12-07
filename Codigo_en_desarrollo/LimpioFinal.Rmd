@@ -339,22 +339,12 @@ rm(ubi_inter)
 rm(ubi_urb)
 ```
 
-# Reconversion de la variable poblacion rural
-
-```{r}
-Data2007$Rur_Porc= 1 - Data2007$Rur_Porc
-names(Data2007)[2]='Urb_Porc'
-Data2017$Rural_Porc= 1 - Data2017$Rural_Porc
-names(Data2017)[2]='Urb_Porc'
-```
-
-
 #Agregando las variables dependientes
 
 ```{r}
-linkexcel='https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/ELECCIONES_UBIGEO_PROPIO_DERECHA.xlsx'
-EleccDer= import(linkexcel)
+EleccDer= import('https://github.com/Samanta-Rivera/EPAP2-Proyecto/raw/master/DATA/ELECCIONES_UBIGEO_PROPIO_DERECHA.xlsx')
 ```
+
 ```{r}
 voto2014=EleccDer[,c(8:14)]
 voto2018=EleccDer[,c(1:7)]
@@ -389,7 +379,6 @@ str(Data2017)
 ```{r}
 rm(voto2014)
 rm(voto2018)
-rm(linkexcel)
 rm(EleccDer)
 ```
 
@@ -679,21 +668,43 @@ names(Data2017)
 
 
 ```{r}
-modelo=formula(VOTODERECHA~ Urb_Porc + Inter_Porc + LifeHope + CompSecEdu + EduYears + IncFamPPC)
+model_2007_1=formula(VOTODERECHA~ Rur_Porc)
+model_2007_2=formula(VOTODERECHA~ Rur_Porc + Inter_Porc)
+model_2007_3=formula(VOTODERECHA~ Rur_Porc + Inter_Porc + LifeHope)
+model_2007_4=formula(VOTODERECHA~ Rur_Porc + Inter_Porc + LifeHope + CompSecEdu)
+model_2007_5=formula(VOTODERECHA~ Rur_Porc + Inter_Porc + LifeHope + CompSecEdu + EduYears)
+model_2007_6=formula(VOTODERECHA~ Rur_Porc + Inter_Porc + LifeHope + CompSecEdu + EduYears + IncFamPPC)
+
+model_2017_1=formula(VOTODERECHA~ Rural_Porc)
+model_2017_2=formula(VOTODERECHA~ Rural_Porc + Inter_Porc)
+model_2017_3=formula(VOTODERECHA~ Rural_Porc + Inter_Porc + LifeHope)
+model_2017_4=formula(VOTODERECHA~ Rural_Porc + Inter_Porc + LifeHope + CompSecEdu)
+model_2017_5=formula(VOTODERECHA~ Rural_Porc + Inter_Porc + LifeHope + CompSecEdu + EduYears)
+model_2017_6=formula(VOTODERECHA~ Rural_Porc + Inter_Porc + LifeHope + CompSecEdu + EduYears + IncFamPPC)
 ```
 
 ```{r,results="asis"}
 library(stargazer)
-reg2007=lm(modelo,data=Data2007)
-stargazer(reg2007,type = "html",intercept.bottom = FALSE)
-summary(reg2007)
+
+reg2007_1=lm(model_2007_1,data=Data2007)
+reg2007_2=lm(model_2007_2,data=Data2007)
+reg2007_3=lm(model_2007_3,data=Data2007)
+reg2007_4=lm(model_2007_4,data=Data2007)
+reg2007_5=lm(model_2007_5,data=Data2007)
+reg2007_6=lm(model_2007_6,data=Data2007)
+
+stargazer(reg2007_1,reg2007_2,reg2007_3,reg2007_4,reg2007_5,reg2007_6,type = "html",intercept.bottom = FALSE)
 ```
 
 ```{r,results="asis"}
-library(stargazer)
-reg2017=lm(modelo,data=Data2017)
-stargazer(reg2017,type = "html",intercept.bottom = FALSE)
-summary(reg2017)
+reg2017_1=lm(model_2017_1,data=Data2017)
+reg2017_2=lm(model_2017_2,data=Data2017)
+reg2017_3=lm(model_2017_3,data=Data2017)
+reg2017_4=lm(model_2017_4,data=Data2017)
+reg2017_5=lm(model_2017_5,data=Data2017)
+reg2017_6=lm(model_2017_6,data=Data2017)
+
+stargazer(reg2017_1,reg2017_2,reg2017_3,reg2017_4,reg2017_5,reg2017_6,type = "html",intercept.bottom = FALSE)
 ```
 
 #Diagosticos de regresión 2007
@@ -793,14 +804,58 @@ Data2017_novote=Data2017[which(Data2017[,9]>0),]
 ```{r}
 library(betareg)
 
-VD=c('Urb_Porc','Inter_Porc', 'LifeHope', 'CompSecEdu', 'EduYears', 'IncFamPPC','VOTODERECHA')
-regData_2007=Data2007_novote[,VD]
-modelBeta_2007=betareg(VOTODERECHA~.,data=regData_2007)
-summary(modelBeta_2007)
+VD_2007_1=c('Rur_Porc','VOTODERECHA')
+VD_2007_2=c('Rur_Porc','Inter_Porc','VOTODERECHA')
+VD_2007_3=c('Rur_Porc','Inter_Porc', 'LifeHope','VOTODERECHA')
+VD_2007_4=c('Rur_Porc','Inter_Porc', 'LifeHope', 'CompSecEdu','VOTODERECHA')
+VD_2007_1=c('Rur_Porc','Inter_Porc', 'LifeHope', 'CompSecEdu', 'EduYears','VOTODERECHA')
+VD_2007_5=c('Rur_Porc','Inter_Porc', 'LifeHope', 'CompSecEdu', 'EduYears','VOTODERECHA')
+VD_2007_6=c('Rur_Porc','Inter_Porc', 'LifeHope', 'CompSecEdu', 'EduYears', 'IncFamPPC','VOTODERECHA')
+
+regData_2007_1=Data2007_novote[,VD_2007_1]
+regData_2007_2=Data2007_novote[,VD_2007_2]
+regData_2007_3=Data2007_novote[,VD_2007_3]
+regData_2007_4=Data2007_novote[,VD_2007_4]
+regData_2007_5=Data2007_novote[,VD_2007_5]
+regData_2007_6=Data2007_novote[,VD_2007_6]
+
+modelBeta_2007_1=betareg(VOTODERECHA~.,data=regData_2007_1)
+modelBeta_2007_2=betareg(VOTODERECHA~.,data=regData_2007_2)
+modelBeta_2007_3=betareg(VOTODERECHA~.,data=regData_2007_3)
+modelBeta_2007_4=betareg(VOTODERECHA~.,data=regData_2007_4)
+modelBeta_2007_5=betareg(VOTODERECHA~.,data=regData_2007_5)
+modelBeta_2007_6=betareg(VOTODERECHA~.,data=regData_2007_6)
+```
+
+
+```{r, results='asis'}
+stargazer(modelBeta_2007_1,modelBeta_2007_2,modelBeta_2007_3,modelBeta_2007_4,modelBeta_2007_5,modelBeta_2007_6,type='html',intercept.bottom = FALSE)
 ```
 
 ```{r}
-regData_2017=Data2017_novote[,VD]
-modelBeta_2017=betareg(VOTODERECHA~.,data=regData_2017)
-summary(modelBeta_2017)
+VD_2017_1=c('Rural_Porc','VOTODERECHA')
+VD_2017_2=c('Rural_Porc','Inter_Porc','VOTODERECHA')
+VD_2017_3=c('Rural_Porc','Inter_Porc', 'LifeHope','VOTODERECHA')
+VD_2017_4=c('Rural_Porc','Inter_Porc', 'LifeHope', 'CompSecEdu','VOTODERECHA')
+VD_2017_1=c('Rural_Porc','Inter_Porc', 'LifeHope', 'CompSecEdu', 'EduYears','VOTODERECHA')
+VD_2017_5=c('Rural_Porc','Inter_Porc', 'LifeHope', 'CompSecEdu', 'EduYears','VOTODERECHA')
+VD_2017_6=c('Rural_Porc','Inter_Porc', 'LifeHope', 'CompSecEdu', 'EduYears', 'IncFamPPC','VOTODERECHA')
+
+regData_2017_1=Data2017_novote[,VD_2017_1]
+regData_2017_2=Data2017_novote[,VD_2017_2]
+regData_2017_3=Data2017_novote[,VD_2017_3]
+regData_2017_4=Data2017_novote[,VD_2017_4]
+regData_2017_5=Data2017_novote[,VD_2017_5]
+regData_2017_6=Data2017_novote[,VD_2017_6]
+
+modelBeta_2017_1=betareg(VOTODERECHA~.,data=regData_2017_1)
+modelBeta_2017_2=betareg(VOTODERECHA~.,data=regData_2017_2)
+modelBeta_2017_3=betareg(VOTODERECHA~.,data=regData_2017_3)
+modelBeta_2017_4=betareg(VOTODERECHA~.,data=regData_2017_4)
+modelBeta_2017_5=betareg(VOTODERECHA~.,data=regData_2017_5)
+modelBeta_2017_6=betareg(VOTODERECHA~.,data=regData_2017_6)
+```
+
+```{r, results='asis'}
+stargazer(modelBeta_2017_1,modelBeta_2017_2,modelBeta_2017_3,modelBeta_2017_4,modelBeta_2017_5,modelBeta_2017_6,type='html',intercept.bottom = FALSE)
 ```
